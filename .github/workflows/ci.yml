@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.13', '1.23.x']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Install nkf for comparison
+        run: sudo apt-get install nkf
+      - name: Test
+        run: go test ./...
+      - name: Check formatting
+        run: |
+          go fmt ./...
+          git diff --exit-code
